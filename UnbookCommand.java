@@ -1,37 +1,61 @@
 package commands;
 
 /**
- * Команда за освобождаване (отмяна на резервация) на билет за дадено място, дата и събитие.
- * Все още не е имплементирана функционалността за отмяна на резервация.
+ * Клас, който имплементира командата за отмяна на резервация.
  */
 public class UnbookCommand implements Command {
     private final TicketSystem system;
 
     /**
-     * Създава нова команда за отмяна на резервация с препратка към системата.
-     * @param system Инстанция на TicketSystem, върху която ще се извършват операциите.
+     * Конструктор на класа, който приема обект от типа TicketSystem.
+     * @param system Инстанция на системата за билети, с която ще работи командата.
      */
     public UnbookCommand(TicketSystem system) {
         this.system = system;
     }
 
     /**
-     * Изпълнява командата "unbook".
-     * Изисква параметри: ред, място, дата и име на събитие.
-     * В момента методът само извежда, че функционалността не е имплементирана.
-     *
-     * @param args Масив от аргументи на командния ред.
-     *             args[0] - ред (row)
-     *             args[1] - място (seat)
-     *             args[2] - дата (date)
-     *             args[3] - име на събитие (event)
+     * Изпълнява командата за отмяна на резервация.
+     * @param args Аргументи подадени от главното меню. Формат: <ред> <място> <дата> <събитие>
+     * @throws IllegalArgumentException при невалидни аргументи
      */
     @Override
-    public void execute(String[] args) {
+    public void execute(String[] args) throws IllegalArgumentException {
         if (args.length < 4) {
-            System.out.println("Usage: unbook <row> <seat> <date> <event>");
+            System.out.println("Грешка: Недостатъчно аргументи. Използване: unbook <ред> <място> <дата> <събитие>");
             return;
         }
-        System.out.println("Unbooking not implemented yet.");
+
+        try {
+            int row = Integer.parseInt(args[0]);
+            int seat = Integer.parseInt(args[1]);
+            String date = args[2];
+            String eventName = args[3];
+
+            Event event = system.getEvent(date, eventName);
+            if (event == null) {
+                System.out.println("Грешка: Събитието не е намерено.");
+                return;
+            }
+
+            Hall hall = event.getHall();
+            if (row < 1 || row > hall.getRows() || seat < 1 || seat > hall.getSeatsPerRow()) {
+                System.out.printf("Грешка: Невалидно място. Зала '%s' има %d реда и %d места на ред.%n",
+                        hall.getName(), hall.getRows(), hall.getSeatsPerRow());
+                return;
+            }
+
+            if (event.unbookSeat(row, seat)) {
+                System.out.printf("Успешна отмяна на резервация за ред %d място %d за %s на %s%n",
+                        row, seat, eventName, date);
+            } else {
+                System.out.printf("Грешка: Няма активна резервация за това място. Статус: %s%n",
+                        event.getSeatStatus(row, seat));
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Грешка: Невалиден номер на ред или място. Моля използвайте числа.");
+        } catch (Exception e) {
+            System.out.println("Грешка: " + e.getMessage());
+        }
     }
 }

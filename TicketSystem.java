@@ -95,10 +95,65 @@ public class TicketSystem {
         int rows = hall.getRows();
         int seats = hall.getSeatsPerRow();
 
+        System.out.println("\nFree seats for '" + name + "' on " + date + " in " + hall.getName() + ":");
+        System.out.println("Legend: [A] Available, [B] Booked, [S] Sold\n");
+
+        boolean hasFreeSeats = false;
+        int availableCount = 0;
+        int bookedCount = 0;
+        int soldCount = 0;
+
         for (int r = 1; r <= rows; r++) {
+            System.out.print("Row " + r + ": ");
             for (int s = 1; s <= seats; s++) {
-                System.out.println("Row " + r + ", Seat " + s + " is available.");
+                String seatKey = r + "-" + s;
+                if (event.isSeatAvailable(r, s)) {
+                    System.out.print("[A] ");
+                    availableCount++;
+                    hasFreeSeats = true;
+                } else {
+                    Ticket ticket = event.getTickets().get(seatKey);
+                    if (ticket.isBought()) {
+                        System.out.print("[S] ");
+                        soldCount++;
+                    } else {
+                        System.out.print("[B] ");
+                        bookedCount++;
+                    }
+                }
             }
+            System.out.println();
+        }
+
+        System.out.println("\nSummary:");
+        System.out.println("Available: " + availableCount);
+        System.out.println("Booked: " + bookedCount);
+        System.out.println("Sold: " + soldCount);
+
+        if (!hasFreeSeats) {
+            System.out.println("\nWARNING: No free seats available for this event!");
+        }
+    }
+
+    /**
+     * Регистрира нов билетен код с информация за място.
+     * @param code Код на билета.
+     * @param info Информация за мястото.
+     */
+    public void registerCode(String code, String info) {
+        codes.put(code, info);
+    }
+
+    /**
+     * Проверява валидността на билетен код.
+     * @param code Код на билета.
+     */
+    public void checkCode(String code) {
+        String info = codes.get(code);
+        if (info != null) {
+            System.out.println("Valid ticket: " + info);
+        } else {
+            System.out.println("Invalid or unknown ticket code.");
         }
     }
 
@@ -134,28 +189,6 @@ public class TicketSystem {
                 printBookings(date, eventName);
             }
         }
-    }
-
-    /**
-     * Проверява валидността на билетен код.
-     * @param code Код на билета.
-     */
-    public void checkCode(String code) {
-        String info = codes.get(code);
-        if (info != null) {
-            System.out.println("Valid ticket: " + info);
-        } else {
-            System.out.println("Invalid or unknown ticket code.");
-        }
-    }
-
-    /**
-     * Регистрира нов билетен код с информация за място.
-     * @param code Код на билета.
-     * @param info Информация за мястото.
-     */
-    public void registerCode(String code, String info) {
-        codes.put(code, info);
     }
 
     /**

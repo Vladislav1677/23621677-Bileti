@@ -1,33 +1,33 @@
-package commands;
+package TicketManagament;
 
 /**
  * Клас, който представлява зала с определен брой редове и места на ред.
  */
 public class Hall {
-    private final String name;
+    private final int number;  // Changed from String name to int number
     private final int rows;
     private final int seatsPerRow;
 
     /**
-     * Конструктор, който създава нова зала с име, брой редове и места на ред.
+     * Конструктор, който създава нова зала с номер, брой редове и места на ред.
      *
-     * @param name Името на залата.
+     * @param number Номерът на залата.
      * @param rows Броят на редовете в залата.
      * @param seatsPerRow Броят на местата във всеки ред.
      */
-    public Hall(String name, int rows, int seatsPerRow) {
-        this.name = name;
+    public Hall(int number, int rows, int seatsPerRow) {
+        this.number = number;
         this.rows = rows;
         this.seatsPerRow = seatsPerRow;
     }
 
     /**
-     * Връща името на залата.
+     * Връща номера на залата.
      *
-     * @return Името на залата.
+     * @return Номера на залата.
      */
-    public String getName() {
-        return name;
+    public int getNumber() {  // Changed from getName() to getNumber()
+        return number;
     }
 
     /**

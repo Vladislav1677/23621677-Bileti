@@ -1,5 +1,7 @@
 package commands;
 
+import TicketManagament.TicketSystem;
+
 /**
  * Клас, реализиращ командата за отваряне на файл със запазени данни на системата.
  */

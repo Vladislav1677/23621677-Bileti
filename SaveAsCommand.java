@@ -1,5 +1,7 @@
 package commands;
 
+import TicketManagament.TicketSystem;
+
 /**
  * Клас, който реализира командата за записване на състоянието на системата в нов файл.
  */

@@ -1,4 +1,4 @@
-package commands;
+package TicketManagament;
 
 /**
  * Клас, който представлява билет с информация за резервация, покупка и бележка.

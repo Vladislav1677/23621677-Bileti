@@ -1,5 +1,7 @@
 package commands;
 
+import TicketManagament.TicketSystem;
+
 /**
  * Клас, който имплементира командата за добавяне на събитие към системата за билети.
  */
@@ -16,20 +18,24 @@ public class AddEventCommand implements Command {
 
     /**
      * Метод, който изпълнява логиката по добавяне на събитие.
-     * Изисква минимум 3 аргумента: дата, зала и име на събитието.
-     * @param args Аргументи подадени от главното меню. Формат: <дата> <зала> <име на събитие>
+     * Изисква минимум 3 аргумента: дата, номер на зала и име на събитието.
+     * @param args Аргументи подадени от главното меню. Формат: <дата> <номер на зала> <име на събитие>
      */
     @Override
     public void execute(String[] args) {
         if (args.length < 3) {
-            System.out.println("Usage: addevent <date> <hall> <name>");
+            System.out.println("Usage: addevent <date> <hall_number> <name>");
             return;
         }
+
         String date = args[0];
-        String hall = args[1];
         String name = String.join(" ", java.util.Arrays.copyOfRange(args, 2, args.length));
+
         try {
-            system.addEvent(date, hall, name);
+            int hallNumber = Integer.parseInt(args[1]);
+            system.addEvent(date, hallNumber, name);
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Hall number must be an integer");
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }

@@ -1,5 +1,7 @@
 package commands;
 
+import TicketManagament.TicketSystem;
+
 /**
  * Клас, който реализира командата за показване на свободните места за дадено събитие.
  */

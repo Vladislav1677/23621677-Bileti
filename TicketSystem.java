@@ -1,4 +1,4 @@
-package commands;
+package TicketManagament;
 
 import java.io.*;
 import java.util.*;
@@ -9,7 +9,7 @@ import java.util.*;
  * запис и зареждане на състоянието на системата.
  */
 public class TicketSystem {
-    private final Map<String, Hall> halls = new HashMap<>();
+    private final Map<Integer, Hall> halls = new HashMap<>(); // Changed from String to Integer for hall numbers
     private final Map<String, Map<String, Event>> events = new HashMap<>(); // дата -> име на събитие -> Event
     private final Map<String, String> codes = new HashMap<>(); // код -> информация за място
 
@@ -17,47 +17,47 @@ public class TicketSystem {
      * Конструктор, който инициализира системата със зададени зали.
      */
     public TicketSystem() {
-        addHall("Hall1", 5, 10);
-        addHall("Hall2", 10, 15);
-        addHall("Hall3", 8, 12);
+        addHall(1, 5, 10);
+        addHall(2, 10, 15);
+        addHall(3, 8, 12);
     }
 
     /**
      * Добавя зала в системата с определени редове и места на ред.
-     * @param name Име на залата.
+     * @param number Номер на залата.
      * @param rows Брой редове в залата.
      * @param seatsPerRow Брой места на ред.
      */
-    public void addHall(String name, int rows, int seatsPerRow) {
-        halls.put(name, new Hall(name, rows, seatsPerRow));
+    public void addHall(int number, int rows, int seatsPerRow) {
+        halls.put(number, new Hall(number, rows, seatsPerRow));
     }
 
     /**
-     * Връща зала по нейното име.
-     * @param name Име на залата.
+     * Връща зала по нейния номер.
+     * @param number Номер на залата.
      * @return Залата или null ако не съществува.
      */
-    public Hall getHall(String name) {
-        return halls.get(name);
+    public Hall getHall(int number) {
+        return halls.get(number);
     }
 
     /**
      * Добавя събитие за дадена дата и зала.
      * Проверява дали залата не е заета на тази дата.
      * @param date Дата на събитието.
-     * @param hallName Име на залата.
+     * @param hallNumber Номер на залата.
      * @param name Име на събитието.
      * @throws Exception Ако залата не съществува или вече е резервирана за тази дата.
      */
-    public void addEvent(String date, String hallName, String name) throws Exception {
-        Hall hall = halls.get(hallName);
-        if (hall == null) throw new Exception("Hall not found: " + hallName);
+    public void addEvent(String date, int hallNumber, String name) throws Exception {
+        Hall hall = halls.get(hallNumber);
+        if (hall == null) throw new Exception("Hall not found: " + hallNumber);
 
         events.putIfAbsent(date, new HashMap<>());
         Map<String, Event> dayEvents = events.get(date);
 
         for (Event ev : dayEvents.values()) {
-            if (ev.getHall().getName().equals(hallName)) {
+            if (ev.getHall().getNumber() == hallNumber) {
                 throw new Exception("Hall already booked on " + date);
             }
         }
@@ -95,7 +95,7 @@ public class TicketSystem {
         int rows = hall.getRows();
         int seats = hall.getSeatsPerRow();
 
-        System.out.println("\nFree seats for '" + name + "' on " + date + " in " + hall.getName() + ":");
+        System.out.println("\nFree seats for '" + name + "' on " + date + " in Hall " + hall.getNumber() + ":");
         System.out.println("Legend: [A] Available, [B] Booked, [S] Sold\n");
 
         boolean hasFreeSeats = false;
@@ -221,7 +221,7 @@ public class TicketSystem {
             for (String date : events.keySet()) {
                 Map<String, Event> dailyEvents = events.get(date);
                 for (Event event : dailyEvents.values()) {
-                    writer.println("addevent " + event.getDate() + " " + event.getHall().getName() + " " + event.getName());
+                    writer.println("addevent " + event.getDate() + " " + event.getHall().getNumber() + " " + event.getName());
                 }
             }
             System.out.println("Saved current state to: " + filename);
@@ -243,9 +243,9 @@ public class TicketSystem {
      * Генерира отчет за събитията в даден период и по зала.
      * @param from Начална дата (включително).
      * @param to Крайна дата (включително).
-     * @param hall Име на залата (може да е null за всички зали).
+     * @param hallNumber Номер на залата (може да е 0 за всички зали).
      */
-    public void generateReport(String from, String to, String hall) {
+    public void generateReport(String from, String to, int hallNumber) {
         for (String date : events.keySet()) {
             if (date.compareTo(from) < 0 || date.compareTo(to) > 0) continue;
 
@@ -253,10 +253,11 @@ public class TicketSystem {
             if (dayEvents == null) continue;
 
             for (Event event : dayEvents.values()) {
-                if (hall != null && !event.getHall().getName().equals(hall)) continue;
+                if (hallNumber != 0 && event.getHall().getNumber() != hallNumber) continue;
 
                 int count = event.countBoughtTickets();
-                System.out.printf("%s (%s): %d tickets sold%n", event.getName(), event.getDate(), count);
+                System.out.printf("%s (%s) in Hall %d: %d tickets sold%n",
+                        event.getName(), event.getDate(), event.getHall().getNumber(), count);
             }
         }
     }

@@ -1,5 +1,9 @@
 package commands;
 
+import TicketManagament.Event;
+import TicketManagament.Hall;
+import TicketManagament.TicketSystem;
+
 /**
  * Клас, който имплементира командата за отмяна на резервация.
  */
@@ -41,7 +45,7 @@ public class UnbookCommand implements Command {
             Hall hall = event.getHall();
             if (row < 1 || row > hall.getRows() || seat < 1 || seat > hall.getSeatsPerRow()) {
                 System.out.printf("Грешка: Невалидно място. Зала '%s' има %d реда и %d места на ред.%n",
-                        hall.getName(), hall.getRows(), hall.getSeatsPerRow());
+                        hall.getNumber(), hall.getRows(), hall.getSeatsPerRow());
                 return;
             }
 

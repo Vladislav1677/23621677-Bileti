@@ -1,5 +1,9 @@
 package commands;
 
+import TicketManagament.Event;
+import TicketManagament.Hall;
+import TicketManagament.TicketSystem;
+
 /**
  * Клас, който имплементира командата за закупуване на билет.
  */
@@ -8,6 +12,7 @@ public class BuyCommand implements Command {
 
     /**
      * Конструктор на класа, който приема обект от типа TicketSystem.
+     *
      * @param system Инстанция на системата за билети, с която ще работи командата.
      */
     public BuyCommand(TicketSystem system) {
@@ -16,6 +21,7 @@ public class BuyCommand implements Command {
 
     /**
      * Изпълнява командата за закупуване на билет.
+     *
      * @param args Аргументи подадени от главното меню. Формат: <ред> <място> <дата> <събитие>
      * @throws IllegalArgumentException при невалидни аргументи
      */
@@ -40,8 +46,8 @@ public class BuyCommand implements Command {
 
             Hall hall = event.getHall();
             if (row < 1 || row > hall.getRows() || seat < 1 || seat > hall.getSeatsPerRow()) {
-                System.out.printf("Грешка: Невалидно място. Зала '%s' има %d реда и %d места на ред.%n",
-                        hall.getName(), hall.getRows(), hall.getSeatsPerRow());
+                System.out.printf("Грешка: Невалидно място. Зала №%d има %d реда и %d места на ред.%n",
+                        hall.getNumber(), hall.getRows(), hall.getSeatsPerRow());
                 return;
             }
 
@@ -63,11 +69,12 @@ public class BuyCommand implements Command {
 
     /**
      * Генерира уникален код за билет.
-     * @param date Дата на събитието
+     *
+     * @param date  Дата на събитието
      * @param event Име на събитието
-     * @param row Ред на мястото
-     * @param seat Място в реда
-     * @param type Тип на билета (BOOK/BUY)
+     * @param row   Ред на мястото
+     * @param seat  Място в реда
+     * @param type  Тип на билета (BOOK/BUY)
      * @return Генериран код за билет
      */
     private String generateTicketCode(String date, String event, int row, int seat, String type) {

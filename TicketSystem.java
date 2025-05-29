@@ -9,9 +9,9 @@ import java.util.*;
  * запис и зареждане на състоянието на системата.
  */
 public class TicketSystem {
-    private final Map<Integer, Hall> halls = new HashMap<>(); // Changed from String to Integer for hall numbers
-    private final Map<String, Map<String, Event>> events = new HashMap<>(); // дата -> име на събитие -> Event
-    private final Map<String, String> codes = new HashMap<>(); // код -> информация за място
+    private final Map<Integer, Hall> halls = new HashMap<>();
+    private final Map<String, Map<String, Event>> events = new HashMap<>();
+    private final Map<String, String> codes = new HashMap<>();
 
     /**
      * Конструктор, който инициализира системата със зададени зали.
@@ -179,8 +179,17 @@ public class TicketSystem {
         if (name != null) {
             Event e = dayEvents.get(name);
             if (e != null) {
-                System.out.println("Bookings for " + name + " on " + date);
-                // TODO: Добави реална информация за резервираните билети
+                System.out.println("Bookings for " + name + " on " + date + ":");
+                Map<String, Ticket> tickets = e.getTickets();
+                if (tickets.isEmpty()) {
+                    System.out.println("  No bookings.");
+                } else {
+                    for (Ticket t : tickets.values()) {
+                        String status = t.isBought() ? "Sold" : "Booked";
+                        System.out.printf("  Seat %d-%d: %s, Code: %s%n",
+                                t.getRow(), t.getSeatNumber(), status, t.getCode());
+                    }
+                }
             } else {
                 System.out.println("No event named " + name + " on " + date);
             }
@@ -190,6 +199,7 @@ public class TicketSystem {
             }
         }
     }
+
 
     /**
      * Запазва текущото състояние на системата във файл "save.dat".
@@ -235,9 +245,44 @@ public class TicketSystem {
      * @param filename Име на файла.
      */
     public void open(String filename) {
-        System.out.println("Opened file: " + filename);
-        // TODO: Имплементирай зареждането от файл
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            halls.clear();
+            events.clear();
+            codes.clear();
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) continue;
+
+                if (line.startsWith("addevent ")) {
+                    String[] parts = line.split(" ", 4);
+                    if (parts.length < 4) {
+                        System.out.println("Invalid line format: " + line);
+                        continue;
+                    }
+
+                    String date = parts[1];
+                    int hallNumber = Integer.parseInt(parts[2]);
+                    String name = parts[3];
+
+                    if (!halls.containsKey(hallNumber)) {
+                        addHall(hallNumber, 10, 15);
+                    }
+
+                    try {
+                        addEvent(date, hallNumber, name);
+                    } catch (Exception e) {
+                        System.out.println("Error adding event from file: " + e.getMessage());
+                    }
+                }
+            }
+            System.out.println("System loaded from file: " + filename);
+        } catch (IOException e) {
+            System.out.println("Error reading file: " + e.getMessage());
+        }
     }
+
 
     /**
      * Генерира отчет за събитията в даден период и по зала.
@@ -253,7 +298,7 @@ public class TicketSystem {
             if (dayEvents == null) continue;
 
             for (Event event : dayEvents.values()) {
-                if (hallNumber != 0 && event.getHall().getNumber() != hallNumber) continue;
+                if (hallNumber != -1 && event.getHall().getNumber() != hallNumber) continue;
 
                 int count = event.countBoughtTickets();
                 System.out.printf("%s (%s) in Hall %d: %d tickets sold%n",

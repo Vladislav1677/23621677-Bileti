@@ -4,7 +4,7 @@ package TicketManagament;
  * Клас, който представлява зала с определен брой редове и места на ред.
  */
 public class Hall {
-    private final int number;  // Changed from String name to int number
+    private final int number;
     private final int rows;
     private final int seatsPerRow;
 
@@ -26,7 +26,7 @@ public class Hall {
      *
      * @return Номера на залата.
      */
-    public int getNumber() {  // Changed from getName() to getNumber()
+    public int getNumber() {
         return number;
     }
 

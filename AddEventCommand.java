@@ -4,12 +4,13 @@ import TicketManagament.TicketSystem;
 
 /**
  * Клас, който имплементира командата за добавяне на събитие към системата за билети.
+ * Позволява добавяне на ново представление на дадена дата и зала.
  */
 public class AddEventCommand implements Command {
     private final TicketSystem system;
 
     /**
-     * Конструктор на класа, който приема обект от типа TicketSystem.
+     * Конструктор, който приема обект от типа TicketSystem.
      * @param system Инстанция на системата за билети, с която ще работи командата.
      */
     public AddEventCommand(TicketSystem system) {
@@ -17,9 +18,10 @@ public class AddEventCommand implements Command {
     }
 
     /**
-     * Метод, който изпълнява логиката по добавяне на събитие.
-     * Изисква минимум 3 аргумента: дата, номер на зала и име на събитието.
-     * @param args Аргументи подадени от главното меню. Формат: <дата> <номер на зала> <име на събитие>
+     * Изпълнява командата за добавяне на събитие.
+     * Формат на аргументите: <date> <hall_number> <name>
+     * Пример: addevent 2025-06-01 2 "Летящият холандец"
+     * @param args Аргументи, подадени от потребителя.
      */
     @Override
     public void execute(String[] args) {
@@ -34,10 +36,13 @@ public class AddEventCommand implements Command {
         try {
             int hallNumber = Integer.parseInt(args[1]);
             system.addEvent(date, hallNumber, name);
+            System.out.println("Събитието е добавено успешно.");
         } catch (NumberFormatException e) {
-            System.out.println("Error: Hall number must be an integer");
+            System.out.println("Грешка: Номерът на залата трябва да е цяло число.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Грешка: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println("Неочаквана грешка: " + e.getMessage());
         }
     }
 }
